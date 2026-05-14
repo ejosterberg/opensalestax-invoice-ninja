@@ -1,0 +1,29 @@
+# Composer
+/vendor/
+composer.lock
+
+# PHPUnit
+/.phpunit.cache/
+/.phpunit.result.cache
+/coverage.xml
+/coverage-html/
+
+# Build artifacts
+/build/
+
+# IDE / editor
+/.idea/
+/.vscode/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local Sonar working tree (created by sonar-scanner)
+/.scannerwork/
+
+# Local env files (sidecar runtime config)
+/.env
+/.env.local

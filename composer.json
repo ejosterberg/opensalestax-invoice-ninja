@@ -1,0 +1,53 @@
+{
+    "name": "ejosterberg/opensalestax-invoice-ninja",
+    "description": "Sidecar webhook listener that adds destination-based US sales tax to Invoice Ninja v5 invoices via the self-hosted OpenSalesTax engine",
+    "type": "project",
+    "license": "Apache-2.0",
+    "keywords": ["invoice-ninja", "laravel", "tax", "sales-tax", "us-tax", "opensalestax", "webhook", "sidecar"],
+    "homepage": "https://github.com/ejosterberg/opensalestax-invoice-ninja",
+    "authors": [
+        {
+            "name": "Eric Osterberg",
+            "email": "ejosterberg@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "ejosterberg/opensalestax": "^0.1",
+        "guzzlehttp/guzzle": "^7.8",
+        "psr/log": "^1.0 || ^2.0 || ^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "phpstan/phpstan": "^1.11",
+        "squizlabs/php_codesniffer": "^3.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "EJOsterberg\\OpenSalesTax\\InvoiceNinja\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "EJOsterberg\\OpenSalesTax\\InvoiceNinja\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@test",
+            "@stan",
+            "@cs",
+            "@audit"
+        ],
+        "test": "phpunit",
+        "stan": "phpstan analyse --no-progress",
+        "cs": "phpcs",
+        "cs-fix": "phpcbf",
+        "audit": "@composer audit"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}

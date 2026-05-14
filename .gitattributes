@@ -1,0 +1,10 @@
+# Force LF line endings for code files so Linux deployments read them correctly.
+*.php text eol=lf
+*.xml text eol=lf
+*.json text eol=lf
+*.neon text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.properties text eol=lf
+*.sh text eol=lf
