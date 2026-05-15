@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] — 2026-05-15
+
+### Added
+
+- **Live-IN integration test pass.** Sidecar validated end-to-end on
+  the test VM against Invoice Ninja v5 (Docker, `invoiceninja-debian:latest`)
+  and the OpenSalesTax engine v0.57.0. Three live invoices (MN/55401,
+  $100 line) successfully picked up `tax_name1="OpenSalesTax"`,
+  `tax_rate1=9.025`, `total_taxes=9.03` after a single round-trip.
+  Engine RTT (cold): 892 ms. RTT (warm): 920-992 ms.
+
+### Fixed
+
+- **Payload parser now reads `client.settings.currency_id`.** Invoice
+  Ninja v5's stock `invoice.created` webhook does NOT include
+  `currency_id` at the top level; it is buried in
+  `client.settings.currency_id`. The previous parser rejected real IN
+  payloads with "payload has no currency identifier" and short-
+  circuited every live webhook with a 204. Verified against an actual
+  IN v5 outbound payload (system_logs id=8 on test VM 918) and covered
+  by two new unit tests.
+
 ## [0.2.0-alpha.1] — 2026-05-13
 
 ### Added

@@ -104,6 +104,37 @@ final class InvoicePayloadTest extends TestCase
         InvoicePayload::fromArray($data);
     }
 
+    /**
+     * Invoice Ninja v5's stock `invoice.created` webhook places
+     * `currency_id` inside `client.settings.currency_id` and does NOT
+     * set it at the top level. Verified against IN v5 on 2026-05-15
+     * (system_logs row id=8 on VM 918).
+     */
+    public function testFallsBackToClientSettingsCurrencyId(): void
+    {
+        $data = self::validPayload();
+        unset($data['currency_id']);
+        $data['client']['settings'] = [
+            'entity' => 'App\\Models\\Client',
+            'currency_id' => '1',
+        ];
+        $p = InvoicePayload::fromArray($data);
+        self::assertSame('USD', $p->currencyCode);
+    }
+
+    public function testRejectsNonUsdInClientSettings(): void
+    {
+        $data = self::validPayload();
+        unset($data['currency_id']);
+        $data['client']['settings'] = [
+            'entity' => 'App\\Models\\Client',
+            'currency_id' => '3', // GBP in IN's currency seed
+        ];
+        $this->expectException(PayloadException::class);
+        $this->expectExceptionMessageMatches('/USD seed/');
+        InvoicePayload::fromArray($data);
+    }
+
     public function testMissingInvoiceIdIsRejected(): void
     {
         $data = self::validPayload();
