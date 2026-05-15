@@ -1,0 +1,28 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+    excludePaths:
+        - vendor
+    reportUnmatchedIgnoredErrors: true
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        # Tests intentionally pass a vanilla Container where ServiceProvider's
+        # @param doc says Application — both are valid in practice; the
+        # provider only calls Container-level methods.
+        -
+            message: '#expects Illuminate\\Contracts\\Foundation\\Application, Illuminate\\Container\\Container given#'
+            path: tests/Unit/Provider/SidecarShimServiceProviderTest.php
+        # The parity test loads the sidecar's SignatureVerifier dynamically
+        # (via require_once) because it lives in the parent repo, not as a
+        # composer dependency. PHPStan can't see those classes.
+        -
+            message: '#Instantiated class .*SignatureVerifier not found#'
+            path: tests/Unit/Signing/SidecarVerifyParityTest.php
+        -
+            message: '#Call to an undefined method object::verify\(\)#'
+            path: tests/Unit/Signing/SidecarVerifyParityTest.php
+        -
+            message: '#expects class-string<Throwable>, string given#'
+            path: tests/Unit/Signing/SidecarVerifyParityTest.php

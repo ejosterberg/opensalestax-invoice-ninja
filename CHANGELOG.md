@@ -5,6 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] — 2026-05-15
+
+### Added
+
+- **Live-IN integration test pass.** Sidecar validated end-to-end on
+  the test VM against Invoice Ninja v5 (Docker, `invoiceninja-debian:latest`)
+  and the OpenSalesTax engine v0.57.0. Three live invoices (MN/55401,
+  $100 line) successfully picked up `tax_name1="OpenSalesTax"`,
+  `tax_rate1=9.025`, `total_taxes=9.03` after a single round-trip.
+  Engine RTT (cold): 892 ms. RTT (warm): 920-992 ms.
+
+### Fixed
+
+- **Payload parser now reads `client.settings.currency_id`.** Invoice
+  Ninja v5's stock `invoice.created` webhook does NOT include
+  `currency_id` at the top level; it is buried in
+  `client.settings.currency_id`. The previous parser rejected real IN
+  payloads with "payload has no currency identifier" and short-
+  circuited every live webhook with a 204. Verified against an actual
+  IN v5 outbound payload (system_logs id=8 on test VM 918) and covered
+  by two new unit tests.
+
+## [0.2.0-alpha.1] — 2026-05-13
+
+### Added
+
+- **Laravel signing shim** as a companion sub-package in `middleware/`,
+  published to Packagist as `ejosterberg/opensalestax-invoice-ninja-shim`.
+  Auto-registering Laravel 11 service provider that adds the
+  `X-Sidecar-Signature` HMAC-SHA256 header to outbound webhooks
+  before they leave Invoice Ninja. Closes the gap left by Invoice
+  Ninja v5's stock webhook subscriber, which emits unsigned POSTs.
+- Artisan command `opensalestax-sidecar-shim:test` for one-shot install
+  verification.
+- 48 PHPUnit tests for the shim, including a cross-package parity test
+  that runs the shim's `Signer` output through the sidecar's actual
+  `SignatureVerifier::verify()`.
+- [`docs/SIGNING-SHIM.md`](docs/SIGNING-SHIM.md) and
+  [`middleware/docs/SHIM-INSTALL.md`](middleware/docs/SHIM-INSTALL.md)
+  documenting the install on a real Invoice Ninja v5 deployment.
+- [`specs/decisions/002-shim-as-subpackage-or-separate-repo.md`](specs/decisions/002-shim-as-subpackage-or-separate-repo.md)
+  recording the sub-package-vs-separate-repo decision.
+
+### Quality
+
+- Shim sub-package: PHPStan **max** clean, PSR-12 clean, `composer audit`
+  clean. Sidecar (`src/`) unchanged and still at 81 tests / 0-0-0-0
+  SonarQube.
+
+### Status
+
+- Pending: live-IN integration test by the orchestrator before
+  graduating to `v0.2.0` stable.
+
 ## [0.1.0-alpha.1] — 2026-05-13
 
 First public release of the OpenSalesTax sidecar for Invoice Ninja v5.
@@ -45,4 +99,5 @@ First public release of the OpenSalesTax sidecar for Invoice Ninja v5.
 - Trusted-proxy list for honoring `X-Forwarded-For`.
 - Refund / credit-note tax handling.
 
+[0.2.0-alpha.1]: https://github.com/ejosterberg/opensalestax-invoice-ninja/releases/tag/v0.2.0-alpha.1
 [0.1.0-alpha.1]: https://github.com/ejosterberg/opensalestax-invoice-ninja/releases/tag/v0.1.0-alpha.1

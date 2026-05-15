@@ -158,7 +158,14 @@ final class InvoicePayload
         if ($expanded !== null) {
             return $expanded;
         }
-        $cid = self::scalarToString($data['currency_id'] ?? $client['currency_id'] ?? null);
+        // Invoice Ninja v5's standard `invoice.created` webhook does NOT
+        // emit `currency_id` at the top level. The currency is buried in
+        // `client.settings.currency_id`. Probe each known location.
+        $cid = self::scalarToString(
+            $data['currency_id']
+            ?? $client['currency_id']
+            ?? (is_array($client['settings'] ?? null) ? ($client['settings']['currency_id'] ?? null) : null)
+        );
         if ($cid === '1') {
             return 'USD';
         }

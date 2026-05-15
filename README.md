@@ -97,7 +97,15 @@ In Invoice Ninja, Settings → Integrations → Webhooks, create a subscriber:
 - Event: `invoice.created` (and `invoice.updated` if you want recalculation on edit)
 - Method: POST
 
-Then sign each request with HMAC-SHA256 of `t.body` (Stripe-style) and include the `X-Sidecar-Signature: t=<unix-seconds>,v1=<hex-digest>` header. If your Invoice Ninja instance doesn't natively sign webhooks, deploy a tiny upstream shim (a 20-line Laravel middleware) — sample in `docs/SIGNING-SHIM.md`. **Unsigned requests are rejected with 401.**
+Then sign each request with HMAC-SHA256 of `t.body` (Stripe-style) and include the `X-Sidecar-Signature: t=<unix-seconds>,v1=<hex-digest>` header. **Unsigned requests are rejected with 401.**
+
+Invoice Ninja v5's stock webhook subscriber emits **unsigned** POSTs, so this repo ships a companion Laravel signing shim that closes the gap — see [`middleware/`](middleware/) (Composer package: `ejosterberg/opensalestax-invoice-ninja-shim`). One-line install:
+
+```bash
+composer require ejosterberg/opensalestax-invoice-ninja-shim
+```
+
+Walkthrough in [`docs/SIGNING-SHIM.md`](docs/SIGNING-SHIM.md) and [`middleware/docs/SHIM-INSTALL.md`](middleware/docs/SHIM-INSTALL.md).
 
 ## Security
 
@@ -132,5 +140,6 @@ Apache-2.0. See [`LICENSE`](LICENSE).
 
 - [`ejosterberg/opensalestax`](https://github.com/ejosterberg/opensalestax) — the tax-calculation engine
 - [`ejosterberg/opensalestax-php`](https://github.com/ejosterberg/opensalestax-php) — the PHP SDK this sidecar depends on
+- [`ejosterberg/opensalestax-invoice-ninja-shim`](middleware/) — companion Laravel signing shim installed inside Invoice Ninja v5 (this repo, `middleware/` sub-package)
 - [`ejosterberg/opensalestax-magento`](https://github.com/ejosterberg/opensalestax-magento) — sibling connector for Magento 2
 - [`ejosterberg/opensalestax-medusa`](https://github.com/ejosterberg/opensalestax-medusa) — sibling connector for Medusa.js
