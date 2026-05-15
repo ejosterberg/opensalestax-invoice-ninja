@@ -3,7 +3,16 @@
     "description": "Sidecar webhook listener that adds destination-based US sales tax to Invoice Ninja v5 invoices via the self-hosted OpenSalesTax engine",
     "type": "project",
     "license": "Apache-2.0",
-    "keywords": ["invoice-ninja", "laravel", "tax", "sales-tax", "us-tax", "opensalestax", "webhook", "sidecar"],
+    "keywords": [
+        "invoice-ninja",
+        "laravel",
+        "tax",
+        "sales-tax",
+        "us-tax",
+        "opensalestax",
+        "webhook",
+        "sidecar"
+    ],
     "homepage": "https://github.com/ejosterberg/opensalestax-invoice-ninja",
     "authors": [
         {
@@ -12,7 +21,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": ">=8.2",
         "ext-json": "*",
         "ejosterberg/opensalestax": "^0.1",
         "guzzlehttp/guzzle": "^7.8",
