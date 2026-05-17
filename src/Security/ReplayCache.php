@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -11,7 +11,7 @@ namespace EJOsterberg\OpenSalesTax\InvoiceNinja\Security;
  *
  * The cache is bounded; oldest entries fall off when the cap is reached.
  * Production deployments running >1 sidecar replica should swap this for
- * a shared cache (Redis SETNX with TTL) — extension point in v0.2.
+ * a shared cache (Redis SETNX with TTL) â€” extension point in v0.2.
  *
  * The cache key is the webhook signature timestamp + the SHA-256 of the
  * raw body. Same payload re-sent within the replay window is rejected.
@@ -34,7 +34,7 @@ final class ReplayCache
 
     /**
      * Returns true if this is a fresh request (record it and continue).
-     * Returns false if we've seen this exact signature already — caller
+     * Returns false if we've seen this exact signature already â€” caller
      * should reject with HTTP 409 / 401.
      */
     public function checkAndRemember(int $timestamp, string $rawBody): bool

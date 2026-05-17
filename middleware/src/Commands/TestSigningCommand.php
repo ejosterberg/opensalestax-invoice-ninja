@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -18,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
  *
  * Posts a sample webhook payload to the configured sidecar URL with a
  * freshly-signed header and prints the HTTP response. Useful for
- * one-shot install verification — if this command prints `200 OK` (or
+ * one-shot install verification â€” if this command prints `200 OK` (or
  * `204 No Content` for out-of-scope invoices) the shim is wired up
  * correctly.
  */

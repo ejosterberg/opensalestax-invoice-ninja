@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -24,7 +24,7 @@ use Psr\Log\LoggerInterface;
  * concurrency response when the invoice has been updated between our
  * webhook event and our write-back). All other 4xx are non-retryable;
  * 5xx logs but does not retry in v0.1 (queue-driven retry is a v0.2
- * concern — would need durable queue, not just in-memory).
+ * concern â€” would need durable queue, not just in-memory).
  *
  * TLS verification is ON by default; the URL is SSRF-validated before
  * every request.
@@ -79,9 +79,9 @@ final class InvoiceNinjaClient
 
     /**
      * Single PUT attempt. Returns one of:
-     *   'ok'    — 2xx response, caller breaks out with success
-     *   'retry' — 409 on first attempt, caller loops
-     *   'fail'  — transport error or non-retryable status, caller breaks out
+     *   'ok'    â€” 2xx response, caller breaks out with success
+     *   'retry' â€” 409 on first attempt, caller loops
+     *   'fail'  â€” transport error or non-retryable status, caller breaks out
      *
      * @param array{tax_name1: string, tax_rate1: float} $payload
      */

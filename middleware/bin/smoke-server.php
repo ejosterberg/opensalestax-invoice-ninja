@@ -12,7 +12,7 @@
  * from the `OST_SIDECAR_SIGNING_SECRET` env var.
  */
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 

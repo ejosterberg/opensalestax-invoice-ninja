@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -24,7 +24,7 @@ namespace EJOsterberg\OpenSalesTax\InvoiceNinja\Config;
  * - OST_API_KEY                     Bearer token for the OST engine, if any
  * - OST_TIMEOUT_SECONDS             default 10
  * - SIDECAR_ALLOW_PRIVATE_NETWORKS  "1" to permit RFC1918 OST/IN URLs
- *                                   (default ON — supported deployment
+ *                                   (default ON â€” supported deployment
  *                                   pattern is same-VM self-hosting)
  * - SIDECAR_REPLAY_WINDOW_SECONDS   default 300; max age of webhook
  *                                   timestamp before we reject as replay

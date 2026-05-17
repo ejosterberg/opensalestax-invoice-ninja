@@ -22,7 +22,7 @@ Single `main` branch, semver tags. Topic branches off `main`, PR back to `main`.
 
 ## License
 
-By contributing, you agree your contribution is licensed under Apache-2.0 (see `LICENSE`).
+By contributing, you agree your contribution is dual-licensed under your choice of Apache-2.0 OR GPL-2.0-or-later (see `LICENSE`).
 
 ## Quality gate
 
@@ -38,7 +38,7 @@ PRs that fail CI cannot merge.
 ## Style points
 
 - `declare(strict_types=1);` at the top of every PHP file
-- SPDX header (`// SPDX-License-Identifier: Apache-2.0`) on every new PHP file
+- SPDX header (`// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later`) on every new PHP file
 - PHPDoc on every public method
 - `final` on production classes by default (sidecar pattern — no plugin/proxy concerns)
 - No `mixed` return types without an inline justification

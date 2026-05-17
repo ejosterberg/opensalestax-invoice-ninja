@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -19,7 +19,7 @@ use EJOsterberg\OpenSalesTax\InvoiceNinja\Security\SignatureVerifier;
 use Psr\Log\LoggerInterface;
 
 /**
- * Sidecar webhook handler — the heart of the integration.
+ * Sidecar webhook handler â€” the heart of the integration.
  *
  * Pipeline for `POST /webhooks/invoice-ninja`:
  *
@@ -34,7 +34,7 @@ use Psr\Log\LoggerInterface;
  *
  * Health endpoint: `GET /health` returns 200 + version. No auth.
  *
- * Constitution §10 disclaimer is included in every 200/204 response body
+ * Constitution Â§10 disclaimer is included in every 200/204 response body
  * that references tax.
  */
 final class WebhookHandler
@@ -93,7 +93,7 @@ final class WebhookHandler
     private function processBody(Request $req): Response
     {
         $parsed = $this->parse($req);
-        // @phpstan-ignore-next-line — provably an InvoicePayload here
+        // @phpstan-ignore-next-line â€” provably an InvoicePayload here
         return $this->process($parsed);
     }
 
@@ -208,7 +208,7 @@ final class WebhookHandler
     }
 
     /**
-     * Engine call + write-back. Always returns a 200 Response — the result
+     * Engine call + write-back. Always returns a 200 Response â€” the result
      * field flags whether write-back actually succeeded.
      */
     private function process(InvoicePayload $payload): Response
@@ -248,7 +248,7 @@ final class WebhookHandler
 
     /**
      * Compute the effective rate to push back to Invoice Ninja's single
-     * `tax_rate1` field — weighted by line subtotal so the per-line breakdown
+     * `tax_rate1` field â€” weighted by line subtotal so the per-line breakdown
      * still reconciles when Invoice Ninja's UI multiplies the rate by the
      * subtotal.
      *

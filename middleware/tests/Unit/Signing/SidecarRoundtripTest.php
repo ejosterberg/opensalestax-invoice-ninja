@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  * The shim's Signer must produce header values that the sidecar's
  * SignatureVerifier accepts byte-for-byte. We mirror the sidecar's
  * verification logic locally (since the shim cannot take a hard
- * dependency on the sidecar's source tree — they are deployed to
+ * dependency on the sidecar's source tree â€” they are deployed to
  * different machines) and roundtrip a variety of payloads.
  *
  * If this test ever fails, the wire format has drifted and the shim
@@ -37,7 +37,7 @@ final class SidecarRoundtripTest extends TestCase
             'invoice.created sample' => [
                 '{"event_type":"invoice.created","data":{"id":"INV-0001","total":12345}}',
             ],
-            'unicode' => ['{"name":"Café Olé","sku":"☃"}'],
+            'unicode' => ['{"name":"CafÃ© OlÃ©","sku":"â˜ƒ"}'],
             'newlines and tabs' => ["line one\nline two\tindented"],
             'large body' => [str_repeat('A', 8192)],
         ];

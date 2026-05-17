@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -144,7 +144,7 @@ final class SigningMiddlewareTest extends TestCase
         // The signature carries a t= timestamp the sidecar checks against
         // its 300s default replay window. We don't enforce that window
         // here (signing side), but we do guarantee that the timestamp
-        // attached is the current clock value — never stale.
+        // attached is the current clock value â€” never stale.
         $clock = static fn (): int => 1_800_000_000;
         $mw = new SigningMiddleware(
             signer: new Signer(self::SECRET, $clock),

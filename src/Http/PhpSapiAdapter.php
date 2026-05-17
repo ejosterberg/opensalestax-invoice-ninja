@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -74,7 +74,7 @@ final class PhpSapiAdapter
     private static function extractSourceIp(array $server): string
     {
         // We intentionally trust REMOTE_ADDR only. X-Forwarded-For is rejected
-        // unless the operator explicitly opts in (v0.2 — needs a trusted-proxy list).
+        // unless the operator explicitly opts in (v0.2 â€” needs a trusted-proxy list).
         if (isset($server['REMOTE_ADDR']) && is_string($server['REMOTE_ADDR'])) {
             return $server['REMOTE_ADDR'];
         }

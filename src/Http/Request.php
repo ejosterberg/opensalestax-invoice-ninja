@@ -1,13 +1,13 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
 namespace EJOsterberg\OpenSalesTax\InvoiceNinja\Http;
 
 /**
- * Minimal request envelope — kept framework-agnostic so the sidecar can run
+ * Minimal request envelope â€” kept framework-agnostic so the sidecar can run
  * under any PHP entry-point (built-in dev server, php-fpm + nginx, or a
  * Symfony HttpFoundation adapter in v0.2).
  *

@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -218,7 +218,7 @@ final class WebhookHandlerTest extends TestCase
         $headers = self::signedHeaders($body);
         $req = new Request('POST', '/webhooks/invoice-ninja', $headers, $body, '127.0.0.1');
         self::assertSame(200, $h->handle($req)->status);
-        // Re-submit identical request — replay cache should reject.
+        // Re-submit identical request â€” replay cache should reject.
         self::assertSame(409, $h->handle($req)->status);
     }
 
@@ -267,7 +267,7 @@ final class WebhookHandlerTest extends TestCase
         $body = self::validBody();
         $req = new Request('POST', '/webhooks/invoice-ninja', self::signedHeaders($body), $body, '9.9.9.9');
         self::assertSame(200, $h->handle($req)->status); // bucket drains
-        // Second request — over the limit. Use a different (valid) body so we
+        // Second request â€” over the limit. Use a different (valid) body so we
         // can't be mistaken for replay; same source IP.
         $body2 = json_encode([
             'id' => 'Bother9876',

@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -10,7 +10,7 @@ use Psr\Log\AbstractLogger;
 use Stringable;
 
 /**
- * Minimal stderr JSON logger. No file handles, no buffering, no PII —
+ * Minimal stderr JSON logger. No file handles, no buffering, no PII â€”
  * just a one-line JSON event per call.
  *
  * Anything matching the redact list is replaced with "***REDACTED***"

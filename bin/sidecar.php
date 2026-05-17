@@ -16,7 +16,7 @@
  * @license Apache-2.0
  */
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -30,7 +30,7 @@ $autoload = __DIR__ . '/../vendor/autoload.php';
 if (!file_exists($autoload)) {
     http_response_code(500);
     header('Content-Type: text/plain');
-    echo "missing vendor/autoload.php — run `composer install` first.\n";
+    echo "missing vendor/autoload.php â€” run `composer install` first.\n";
     exit(1);
 }
 require $autoload;

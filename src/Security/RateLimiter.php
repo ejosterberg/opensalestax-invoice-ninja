@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -15,7 +15,7 @@ namespace EJOsterberg\OpenSalesTax\InvoiceNinja\Security;
  *
  * In-memory state means rate limits reset on process restart. For a
  * multi-process / multi-replica deployment, this needs Redis/Memcached
- * backing — flagged in `docs/SECURITY-REVIEW.md` as a v0.2 follow-up.
+ * backing â€” flagged in `docs/SECURITY-REVIEW.md` as a v0.2 follow-up.
  */
 final class RateLimiter
 {

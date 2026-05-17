@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -20,7 +20,7 @@ final class RateLimiterTest extends TestCase
         for ($i = 0; $i < 60; $i++) {
             self::assertTrue($r->allow('1.2.3.4'), "request {$i} should be allowed");
         }
-        // 61st request — bucket empty.
+        // 61st request â€” bucket empty.
         self::assertFalse($r->allow('1.2.3.4'));
     }
 
@@ -35,7 +35,7 @@ final class RateLimiterTest extends TestCase
             $r->allow('1.2.3.4');
         }
         self::assertFalse($r->allow('1.2.3.4'));
-        // Advance one second — at 1 token/sec, exactly one slot opens up.
+        // Advance one second â€” at 1 token/sec, exactly one slot opens up.
         $now = 1.0;
         self::assertTrue($r->allow('1.2.3.4'));
         self::assertFalse($r->allow('1.2.3.4'));
@@ -46,7 +46,7 @@ final class RateLimiterTest extends TestCase
         $r = new RateLimiter(1, static fn (): float => 0.0);
         self::assertTrue($r->allow('1.1.1.1'));
         self::assertFalse($r->allow('1.1.1.1'));
-        // Different IP — still allowed because its bucket is full.
+        // Different IP â€” still allowed because its bucket is full.
         self::assertTrue($r->allow('2.2.2.2'));
     }
 }

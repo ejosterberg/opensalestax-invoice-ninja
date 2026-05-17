@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -13,7 +13,7 @@ use Psr\Http\Message\RequestInterface;
  * Guzzle middleware factory that adds the X-Sidecar-Signature header to
  * outbound HTTP requests whose URL targets the configured sidecar.
  *
- * The middleware is intentionally narrow — it only signs requests that
+ * The middleware is intentionally narrow â€” it only signs requests that
  * match the configured sidecar URL prefix, so it can be safely installed
  * on Invoice Ninja's global Guzzle handler stack without leaking the
  * signing secret to unrelated outbound calls.

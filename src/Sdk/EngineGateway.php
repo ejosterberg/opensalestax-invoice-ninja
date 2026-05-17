@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
  *
  * Failure model: any SDK exception is converted to a single
  * EngineException so the caller has one type to catch. The webhook handler
- * fails soft by default — engine errors do NOT block invoice creation,
+ * fails soft by default â€” engine errors do NOT block invoice creation,
  * they just leave the invoice untaxed and log loudly.
  */
 final class EngineGateway
@@ -38,7 +38,7 @@ final class EngineGateway
      * Returns the engine response, or null on any fail-soft path (logged).
      *
      * The webhook handler interprets a null return as "leave the invoice
-     * unchanged" — the merchant sees no tax line, the operator sees a log.
+     * unchanged" â€” the merchant sees no tax line, the operator sees a log.
      */
     public function calculate(InvoicePayload $payload): ?CalculateResponse
     {

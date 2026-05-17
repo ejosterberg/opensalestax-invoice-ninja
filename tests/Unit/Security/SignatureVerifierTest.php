@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -95,7 +95,7 @@ final class SignatureVerifierTest extends TestCase
     public function testV1HexDigestLengthIsEnforced(): void
     {
         $v = new SignatureVerifier(self::SECRET, replayWindowSeconds: 60);
-        // 63-char hex (one short of 64) — malformed
+        // 63-char hex (one short of 64) â€” malformed
         $this->expectException(SignatureException::class);
         $v->verify('{}', 't=1700000000,v1=' . str_repeat('a', 63));
     }

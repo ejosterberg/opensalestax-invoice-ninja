@@ -1,6 +1,6 @@
 <?php
 
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
 
 declare(strict_types=1);
 
@@ -58,7 +58,7 @@ final class ReplayCacheTest extends TestCase
         $now = 1_003;
         self::assertTrue($c->checkAndRemember(1_003, 'd'));
         self::assertSame(3, $c->size());
-        // 'a' was evicted — re-submit should be considered fresh.
+        // 'a' was evicted â€” re-submit should be considered fresh.
         $now = 1_004;
         self::assertTrue($c->checkAndRemember(1_000, 'a'));
     }
