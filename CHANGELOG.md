@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-05-19
+
+### Added
+
+- **Per-state nexus filter (CP-3).** New `OST_NEXUS_STATES` env var
+  accepts a comma-separated list of US 2-letter state codes
+  (e.g. `MN,WI,IA`). When set, the sidecar short-circuits the engine
+  call for any invoice whose ship-to / billing state is not in the
+  list — the webhook returns 200 with
+  `{ "applied": false, "reason": "nexus_filter_skipped" }` and
+  Invoice Ninja's invoice is left untaxed. Unset / empty preserves
+  v0.2 behavior (engine called for every US/USD invoice). Missing /
+  unresolvable destination state with the filter active is
+  fail-closed.
+
+  Address parsing: Invoice Ninja v5 stores the state on
+  `client.shipping_state` (or `client.state` as fallback) as a
+  2-letter code; we accept that directly and upper-case at extract
+  time. Anything that isn't a 2-letter value yields null
+  (treated as unresolvable).
+
+  Brings this connector in line with WooCommerce v0.5, Vendure v1.2,
+  and Odoo v0.3, which already shipped this filter. Major win for
+  merchants with limited nexus footprints — typical merchant only
+  has 1–3 nexus states and was previously paying engine RTT on
+  every invoice.
+
 ## [0.2.2] — 2026-05-19
 
 ### Added

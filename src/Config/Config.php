@@ -31,6 +31,14 @@ namespace EJOsterberg\OpenSalesTax\InvoiceNinja\Config;
  * - SIDECAR_TLS_VERIFY              "0" disables TLS verification
  *                                   (default ON; only off for local dev)
  * - SIDECAR_RATE_LIMIT_PER_MINUTE   default 120; in-memory token bucket
+ * - OST_NEXUS_STATES                Comma-separated US 2-letter state
+ *                                   codes (e.g. "MN,WI,IA") — when set,
+ *                                   sidecar short-circuits the engine
+ *                                   call for invoices whose ship-to /
+ *                                   billing state is not in the list.
+ *                                   Empty / unset = filter disabled
+ *                                   (engine called for every US/USD
+ *                                   invoice — pre-v0.3 behavior).
  */
 final class Config
 {
@@ -140,6 +148,29 @@ final class Config
         return $i;
     }
 
+    /**
+     * Per-state nexus allowlist (CP-3, v0.3.0). Returns an array of
+     * upper-case 2-letter US state codes parsed from
+     * `OST_NEXUS_STATES`. Empty = filter disabled.
+     *
+     * @return string[]
+     */
+    public function nexusStates(): array
+    {
+        $raw = $this->optional('OST_NEXUS_STATES');
+        if ($raw === null || trim($raw) === '') {
+            return [];
+        }
+        $parts = preg_split('/[\s,]+/', strtoupper($raw)) ?: [];
+        $out = [];
+        foreach ($parts as $p) {
+            if (preg_match('/^[A-Z]{2}$/', $p) === 1 && !in_array($p, $out, true)) {
+                $out[] = $p;
+            }
+        }
+        return $out;
+    }
+
     private function required(string $key): string
     {
         $v = $this->env[$key] ?? '';
@@ -169,6 +200,7 @@ final class Config
             'IN_API_URL', 'IN_API_TOKEN', 'IN_WEBHOOK_SIGNING_SECRET',
             'SIDECAR_ALLOW_PRIVATE_NETWORKS', 'SIDECAR_REPLAY_WINDOW_SECONDS',
             'SIDECAR_TLS_VERIFY', 'SIDECAR_RATE_LIMIT_PER_MINUTE',
+            'OST_NEXUS_STATES',
         ];
         foreach ($keys as $k) {
             if (!isset($out[$k])) {

@@ -65,6 +65,7 @@ final class Bootstrap
             engine: $engineGateway,
             invoiceNinja: $invoiceNinjaClient,
             logger: $logger,
+            nexusStates: $config->nexusStates(),
         );
     }
 }

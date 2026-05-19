@@ -53,6 +53,14 @@ final class InvoicePayload
         public readonly string $currencyCode,
         public readonly string $countryCode,
         public readonly array $lines,
+        /**
+         * Upper-case 2-letter US state code (e.g. "MN"), or null if the
+         * payload didn't include a resolvable state. Used by the per-state
+         * nexus filter (CP-3, v0.3.0). Invoice Ninja v5 stores the state
+         * on `client.shipping_state` (or `client.state` as fallback) as a
+         * 2-letter code; we accept that directly.
+         */
+        public readonly ?string $stateCode = null,
     ) {
     }
 
@@ -92,7 +100,36 @@ final class InvoicePayload
             throw new PayloadException('payload has no line items');
         }
 
-        return new self($invoiceId, $zip5, $zip4, $currencyCode, $countryCode, $lines);
+        $stateCode = self::resolveStateCode($client);
+
+        return new self($invoiceId, $zip5, $zip4, $currencyCode, $countryCode, $lines, $stateCode);
+    }
+
+    /**
+     * Best-effort extraction of a 2-letter US state code from the client
+     * object. Invoice Ninja's standard webhook ships `shipping_state` and
+     * `state` as 2-letter strings. Returns null when neither field yields
+     * a 2-letter value. The nexus filter treats null as "unresolvable"
+     * (fail-closed) when the filter is active.
+     *
+     * @param array<mixed> $client
+     */
+    private static function resolveStateCode(array $client): ?string
+    {
+        $candidates = [
+            $client['shipping_state'] ?? null,
+            $client['state'] ?? null,
+        ];
+        foreach ($candidates as $raw) {
+            if (!is_string($raw)) {
+                continue;
+            }
+            $upper = strtoupper(trim($raw));
+            if (preg_match('/^[A-Z]{2}$/', $upper) === 1) {
+                return $upper;
+            }
+        }
+        return null;
     }
 
     /**

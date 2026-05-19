@@ -41,6 +41,14 @@ final class WebhookHandler
 {
     public const VERSION = '0.1.0-alpha.1';
 
+    /**
+     * @param string[] $nexusStates Per-state nexus allowlist (CP-3, v0.3.0).
+     *     Upper-case 2-letter US state codes. Empty = filter disabled
+     *     (engine called for every US/USD invoice). Non-empty = engine
+     *     only called when the invoice's `stateCode` is in this set.
+     *     Missing / unresolvable state with the filter active is
+     *     fail-closed (no engine call, no tax line).
+     */
     public function __construct(
         private readonly SignatureVerifier $signature,
         private readonly ReplayCache $replayCache,
@@ -48,6 +56,7 @@ final class WebhookHandler
         private readonly EngineGateway $engine,
         private readonly InvoiceNinjaClient $invoiceNinja,
         private readonly LoggerInterface $logger,
+        private readonly array $nexusStates = [],
     ) {
     }
 
@@ -213,6 +222,22 @@ final class WebhookHandler
      */
     private function process(InvoicePayload $payload): Response
     {
+        // Per-state nexus filter (CP-3, v0.3.0). When configured, short-circuit
+        // the engine call for any invoice whose ship-to / billing state is
+        // not in the merchant's nexus list. Fail-closed on unresolvable state.
+        if ($this->shouldSkipForNexus($payload->stateCode)) {
+            $this->logger->info('nexus-filter short-circuited engine call', [
+                'invoice_id' => $payload->invoiceId,
+                'state' => $payload->stateCode ?? '(unresolvable)',
+            ]);
+            return Response::json(200, [
+                'invoice_id' => $payload->invoiceId,
+                'applied' => false,
+                'reason' => 'nexus_filter_skipped',
+                'disclaimer' => Response::DISCLAIMER,
+            ]);
+        }
+
         $response = $this->engine->calculate($payload);
         if ($response === null) {
             return Response::json(200, [
@@ -223,6 +248,21 @@ final class WebhookHandler
             ]);
         }
         return $this->buildSuccessResponse($payload, $response);
+    }
+
+    /**
+     * Returns true when the per-state nexus filter is enabled AND the
+     * destination state is NOT in the allowlist (or is unresolvable).
+     */
+    private function shouldSkipForNexus(?string $stateCode): bool
+    {
+        if ($this->nexusStates === []) {
+            return false; // filter disabled
+        }
+        if ($stateCode === null) {
+            return true; // fail-closed when filter is on
+        }
+        return !in_array($stateCode, $this->nexusStates, true);
     }
 
     private function buildSuccessResponse(

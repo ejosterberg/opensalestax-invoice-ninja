@@ -75,6 +75,7 @@ cp .env.example .env
 | `SIDECAR_REPLAY_WINDOW_SECONDS` | no | `300` | Max age of a signed webhook before it's rejected as replay, range `[30, 3600]` |
 | `SIDECAR_TLS_VERIFY` | no | `1` | TLS peer-verify on outbound calls |
 | `SIDECAR_RATE_LIMIT_PER_MINUTE` | no | `120` | Per-source-IP rate limit on the inbound webhook endpoint |
+| `OST_NEXUS_STATES` | no | (empty) | **v0.3 (CP-3):** Comma-separated US 2-letter state codes (e.g. `MN,WI,IA`) the merchant has nexus in. When set, the sidecar short-circuits the engine call for invoices whose ship-to state is not in the list — the webhook returns 200 with `applied:false, reason:nexus_filter_skipped` and Invoice Ninja's invoice stays untaxed. Empty = filter disabled (pre-v0.3 behavior). Missing / unresolvable state with the filter active is fail-closed. |
 
 ## Run
 

@@ -33,10 +33,16 @@ final class WebhookHandlerTest extends TestCase
      * @param list<GuzzleResponse|\Throwable> $engineQueue
      * @param list<GuzzleResponse|\Throwable> $invoiceNinjaQueue
      */
+    /**
+     * @param list<GuzzleResponse|\Throwable> $engineQueue
+     * @param list<GuzzleResponse|\Throwable> $invoiceNinjaQueue
+     * @param string[] $nexusStates
+     */
     private function handler(
         array $engineQueue = [],
         array $invoiceNinjaQueue = [],
         int $rateLimit = 100,
+        array $nexusStates = [],
     ): WebhookHandler {
         $engineGuzzle = new GuzzleClient(['handler' => HandlerStack::create(new MockHandler($engineQueue))]);
         $inGuzzle = new GuzzleClient(['handler' => HandlerStack::create(new MockHandler($invoiceNinjaQueue))]);
@@ -69,6 +75,7 @@ final class WebhookHandlerTest extends TestCase
             engine: $engine,
             invoiceNinja: $invoiceNinja,
             logger: $logger,
+            nexusStates: $nexusStates,
         );
     }
 
@@ -283,5 +290,100 @@ final class WebhookHandlerTest extends TestCase
     {
         $response = new CalculateResponse(subtotal: '0', taxTotal: '0', lines: [], disclaimer: '');
         self::assertSame(0.0, WebhookHandler::weightedRatePercent($response));
+    }
+
+    // --- CP-3 per-state nexus filter (v0.3.0) -------------------------------
+
+    private static function bodyWithState(string $state, string $invoiceId = 'Aabcd1234'): string
+    {
+        return json_encode([
+            'id' => $invoiceId,
+            'currency_id' => '1',
+            'client' => [
+                'shipping_country_id' => '840',
+                'shipping_postal_code' => '55401-1234',
+                'shipping_state' => $state,
+            ],
+            'line_items' => [['cost' => '100.00', 'quantity' => '1']],
+        ], JSON_THROW_ON_ERROR);
+    }
+
+    public function testNexusFilterDisabledByDefault(): void
+    {
+        // No nexusStates configured => engine called as usual.
+        $h = $this->handler(
+            engineQueue: [new GuzzleResponse(200, ['Content-Type' => 'application/json'], self::engineCalculateBody())],
+            invoiceNinjaQueue: [new GuzzleResponse(200, [], '{}')],
+        );
+        $body = self::bodyWithState('MN');
+        $req = new Request('POST', '/webhooks/invoice-ninja', self::signedHeaders($body), $body, '127.0.0.1');
+        $resp = $h->handle($req);
+        self::assertSame(200, $resp->status);
+        $decoded = JsonAssert::decodeObject($resp->body);
+        self::assertTrue($decoded['applied']);
+    }
+
+    public function testNexusFilterAllowsInListedState(): void
+    {
+        $h = $this->handler(
+            engineQueue: [new GuzzleResponse(200, ['Content-Type' => 'application/json'], self::engineCalculateBody())],
+            invoiceNinjaQueue: [new GuzzleResponse(200, [], '{}')],
+            nexusStates: ['MN', 'WI', 'IA'],
+        );
+        $body = self::bodyWithState('MN');
+        $req = new Request('POST', '/webhooks/invoice-ninja', self::signedHeaders($body), $body, '127.0.0.1');
+        $resp = $h->handle($req);
+        self::assertSame(200, $resp->status);
+        $decoded = JsonAssert::decodeObject($resp->body);
+        self::assertTrue($decoded['applied']);
+    }
+
+    public function testNexusFilterShortCircuitsOutOfStateInvoice(): void
+    {
+        // Empty queues — any engine call would throw a MockHandler exhaustion error.
+        $h = $this->handler(nexusStates: ['MN', 'WI', 'IA']);
+        $body = self::bodyWithState('CA');
+        $req = new Request('POST', '/webhooks/invoice-ninja', self::signedHeaders($body), $body, '127.0.0.1');
+        $resp = $h->handle($req);
+        self::assertSame(200, $resp->status);
+        $decoded = JsonAssert::decodeObject($resp->body);
+        self::assertFalse($decoded['applied']);
+        self::assertSame('nexus_filter_skipped', $decoded['reason']);
+    }
+
+    public function testNexusFilterFailsClosedOnUnresolvableState(): void
+    {
+        $h = $this->handler(nexusStates: ['MN', 'WI', 'IA']);
+        // No `shipping_state` on the client object.
+        $body = json_encode([
+            'id' => 'Aabcd1234',
+            'currency_id' => '1',
+            'client' => [
+                'shipping_country_id' => '840',
+                'shipping_postal_code' => '55401-1234',
+            ],
+            'line_items' => [['cost' => '100.00', 'quantity' => '1']],
+        ], JSON_THROW_ON_ERROR);
+        $req = new Request('POST', '/webhooks/invoice-ninja', self::signedHeaders($body), $body, '127.0.0.1');
+        $resp = $h->handle($req);
+        self::assertSame(200, $resp->status);
+        $decoded = JsonAssert::decodeObject($resp->body);
+        self::assertFalse($decoded['applied']);
+        self::assertSame('nexus_filter_skipped', $decoded['reason']);
+    }
+
+    public function testNexusFilterCaseInsensitive(): void
+    {
+        $h = $this->handler(
+            engineQueue: [new GuzzleResponse(200, ['Content-Type' => 'application/json'], self::engineCalculateBody())],
+            invoiceNinjaQueue: [new GuzzleResponse(200, [], '{}')],
+            nexusStates: ['MN'],
+        );
+        $body = self::bodyWithState('mn'); // lowercase — InvoicePayload upper-cases at extract.
+        $req = new Request('POST', '/webhooks/invoice-ninja', self::signedHeaders($body), $body, '127.0.0.1');
+        $resp = $h->handle($req);
+        self::assertSame(200, $resp->status);
+        $decoded = JsonAssert::decodeObject($resp->body);
+        self::assertTrue($decoded['applied']);
     }
 }

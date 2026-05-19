@@ -203,4 +203,44 @@ final class InvoicePayloadTest extends TestCase
         // 12.34 * 3 = 37.02
         self::assertSame('37.02', $p->lines[0]->subtotal);
     }
+
+    // --- CP-3 state extraction (v0.3.0) ------------------------------------
+
+    public function testStateCodeIsNullWhenAddressLacksState(): void
+    {
+        $p = InvoicePayload::fromArray(self::validPayload());
+        self::assertNull($p->stateCode);
+    }
+
+    public function testStateCodeFromShippingStateField(): void
+    {
+        $data = self::validPayload();
+        $data['client']['shipping_state'] = 'MN';
+        $p = InvoicePayload::fromArray($data);
+        self::assertSame('MN', $p->stateCode);
+    }
+
+    public function testStateCodeNormalizedToUpperCase(): void
+    {
+        $data = self::validPayload();
+        $data['client']['shipping_state'] = 'mn';
+        $p = InvoicePayload::fromArray($data);
+        self::assertSame('MN', $p->stateCode);
+    }
+
+    public function testStateCodeFallsBackToBillingState(): void
+    {
+        $data = self::validPayload();
+        $data['client']['state'] = 'WI';
+        $p = InvoicePayload::fromArray($data);
+        self::assertSame('WI', $p->stateCode);
+    }
+
+    public function testStateCodeNullForNonTwoLetterValue(): void
+    {
+        $data = self::validPayload();
+        $data['client']['shipping_state'] = 'Minnesota';
+        $p = InvoicePayload::fromArray($data);
+        self::assertNull($p->stateCode);
+    }
 }

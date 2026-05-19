@@ -145,4 +145,33 @@ final class ConfigTest extends TestCase
         // Public fields not masked.
         self::assertSame('https://ost.example.com', $dump['OST_ENGINE_URL']);
     }
+
+    // --- CP-3 nexus_states parsing (v0.3.0) ---------------------------------
+
+    public function testNexusStatesDefaultsToEmpty(): void
+    {
+        $c = new Config(self::validEnv());
+        self::assertSame([], $c->nexusStates());
+    }
+
+    public function testNexusStatesParsesCommaSeparated(): void
+    {
+        $env = self::validEnv();
+        $env['OST_NEXUS_STATES'] = 'MN,WI,IA';
+        self::assertSame(['MN', 'WI', 'IA'], (new Config($env))->nexusStates());
+    }
+
+    public function testNexusStatesNormalizesLowercase(): void
+    {
+        $env = self::validEnv();
+        $env['OST_NEXUS_STATES'] = 'mn, wi, ia';
+        self::assertSame(['MN', 'WI', 'IA'], (new Config($env))->nexusStates());
+    }
+
+    public function testNexusStatesDropsMalformedTokens(): void
+    {
+        $env = self::validEnv();
+        $env['OST_NEXUS_STATES'] = 'MN, Minnesota, 12, ,WI';
+        self::assertSame(['MN', 'WI'], (new Config($env))->nexusStates());
+    }
 }
