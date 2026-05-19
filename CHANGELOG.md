@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] — 2026-05-19
+
+### Changed
+
+- **CP-8 Phase 5D: bumped `ejosterberg/opensalestax` constraint to `^0.2.0`.**
+  Picks up the new `OpenSalesTax\Client::capabilities()` /
+  `OpenSalesTax\Client::capabilitiesCached()` helpers for engine v0.59.0's
+  `/v1/capabilities` endpoint. No merchant-visible behavior change in
+  this release — the helper is available to sidecar code but not yet
+  wired into any feature path. Constraint bump only; Test Connection
+  surface enrichment deferred to v-next.
+
 ## [0.3.0] — 2026-05-19
 
 ### Added
