@@ -89,6 +89,29 @@ For production, behind nginx + PHP-FPM. The sidecar exposes two paths:
 - `GET /health` — health probe, returns `{"status":"ok",...}`
 - `POST /webhooks/invoice-ninja` — the webhook endpoint Invoice Ninja calls
 
+## Verify engine connectivity (CLI)
+
+Before wiring up the webhook, confirm the sidecar can reach the configured
+OpenSalesTax engine:
+
+```bash
+$ bin/console health:check
+✓ Engine v0.59.0 reachable — status=ok database=connected (RTT 41 ms)
+```
+
+The command uses the same `OST_ENGINE_URL` + `OST_API_KEY` + SSRF URL
+validator as the webhook handler, so a green check here guarantees the same
+auth + URL path will work at webhook delivery time. Exit codes:
+
+- `0` — engine reachable
+- `1` — config error (missing/invalid env var)
+- `2` — engine unreachable / non-200 / transport error
+
+This is the sidecar equivalent of the "Test Connection" admin button shipped
+in the WooCommerce, Vendure, and Saleor connectors — same intent (catch
+typo'd engine URLs at deploy time instead of at first checkout), different
+surface (no admin UI on a headless sidecar).
+
 ## Wire up the Invoice Ninja webhook
 
 In Invoice Ninja, Settings → Integrations → Webhooks, create a subscriber:

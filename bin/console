@@ -1,0 +1,57 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * `bin/console` — CLI entry point for the opensalestax-invoice-ninja sidecar.
+ *
+ * Currently ships a single subcommand:
+ *
+ *   bin/console health:check
+ *     Probe the configured engine's /v1/health endpoint and exit
+ *     0 (reachable) / 1 (config error) / 2 (engine unreachable).
+ *
+ * Future subcommands (debug-replay, signing-key-rotate, etc.) plug in
+ * via the same router below.
+ *
+ * Uses the same Config + StderrLogger graph as the HTTP entry-point in
+ * bin/sidecar.php — read OST_ENGINE_URL etc. from the process env.
+ *
+ * @license Apache-2.0 OR GPL-2.0-or-later
+ */
+
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
+
+declare(strict_types=1);
+
+use EJOsterberg\OpenSalesTax\InvoiceNinja\Cli\HealthCheckCommand;
+use EJOsterberg\OpenSalesTax\InvoiceNinja\Config\ConfigException;
+
+$autoload = __DIR__ . '/../vendor/autoload.php';
+if (!file_exists($autoload)) {
+    fwrite(STDERR, "missing vendor/autoload.php — run `composer install` first.\n");
+    exit(1);
+}
+require $autoload;
+
+$argv = $_SERVER['argv'] ?? [];
+$subcommand = $argv[1] ?? '';
+
+if ($subcommand === '' || $subcommand === '-h' || $subcommand === '--help' || $subcommand === 'help') {
+    fwrite(STDOUT, "Usage: bin/console <subcommand>\n\nSubcommands:\n  health:check    Probe the configured OST engine and report reachability.\n  help            Show this message.\n");
+    exit(0);
+}
+
+switch ($subcommand) {
+    case 'health:check':
+        try {
+            $cmd = HealthCheckCommand::fromProcessEnv();
+        } catch (ConfigException $e) {
+            fwrite(STDERR, "config error: " . $e->getMessage() . "\n");
+            exit(1);
+        }
+        exit($cmd->run(STDOUT));
+
+    default:
+        fwrite(STDERR, "unknown subcommand: $subcommand\nrun `bin/console help` for the list.\n");
+        exit(1);
+}
