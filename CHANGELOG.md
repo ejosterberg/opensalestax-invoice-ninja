@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] — 2026-05-19
+
+### Changed
+
+- **CP-9: bumped `ejosterberg/opensalestax` constraint from `^0.2.0` to
+  `^0.3.0`.** Picks up the SDK's new `?Shipping $shipping = null` arg
+  on `Client::calculate()` plus `CalculateResponse::$shipping` /
+  `$coverageWarning`.
+
+### Notes
+
+- Invoice Ninja's webhook payload doesn't expose a separate pre-tax
+  shipping field — invoices are flat line-item lists. The connector
+  treats each line item as taxable per its category mapping; merchants
+  who include a shipping line as a regular invoice line will see it
+  taxed correctly via the existing line-item path (no per-state
+  shipping-taxability rule application). No behavior change in this
+  release.
+
 ## [0.3.1] — 2026-05-19
 
 ### Changed
